@@ -1,0 +1,330 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package py.edu.fiuni.gameshop.view.rental;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import javax.swing.table.DefaultTableModel;
+import py.edu.fiuni.gameshop.controller.rental.ReturnController;
+import py.edu.fiuni.gameshop.dao.mysql.DAOConnection;
+import py.edu.fiuni.gameshop.dao.mysql.MySQLClientDAO;
+import py.edu.fiuni.gameshop.dao.mysql.MySQLGameDAO;
+import py.edu.fiuni.gameshop.dao.mysql.MySQLRentalDAO;
+import py.edu.fiuni.gameshop.dao.mysql.MySQLRentalDetailDAO;
+import py.edu.fiuni.gameshop.dao.mysql.MySQLPolicyDAO;
+import py.edu.fiuni.gameshop.model.Client;
+import py.edu.fiuni.gameshop.model.Game;
+import py.edu.fiuni.gameshop.model.Rental;
+
+/*
+ *UNIVERSIDAD NACIONAL DE ITAPUA
+ *PROJECT GAMESHOP
+ *
+ * 2020 - SEGUNDO SEMESTRE
+ *
+ *  Jorge Tyrakowski & Pamela Horn
+ */
+
+/**
+ * This class contains the panel for returning video games.
+ */
+public class PanelReturnGames extends javax.swing.JPanel {
+
+    private MySQLRentalDAO rdao;
+    private MySQLRentalDetailDAO rddao;
+    private MySQLClientDAO cdao;
+    private MySQLGameDAO gdao;
+    private MySQLPolicyDAO pdao;
+
+    private ReturnController controller;
+    private DAOConnection connection;
+
+    private Rental rental;
+    private Game game;
+    private Client client;
+    private String clientDNI = "";
+    private String selectedGame = "";
+    //private double cost;
+
+     /**
+     * Constructor where the necessary for the use of the panel is initialized.
+     */
+    public PanelReturnGames() {
+        initComponents();
+        this.connection = new DAOConnection();
+        this.rdao = new MySQLRentalDAO(connection);
+        this.cdao = new MySQLClientDAO(connection);
+        this.gdao = new MySQLGameDAO(connection);
+        this.rddao = new MySQLRentalDetailDAO(connection);
+        this.pdao = new MySQLPolicyDAO(connection);
+        this.controller = new ReturnController(rdao, rddao, cdao, gdao, pdao, this);
+        addListeners();
+        consultTable();
+
+    }
+
+    
+    /**
+     * Method in charge of updating the table by consulting the information in
+     * the database.
+     */
+    private void consultTable() {
+        try {
+            DefaultTableModel model = new DefaultTableModel();
+            this.jtblRentedGames.setModel(model);
+
+            Connection con = this.connection.getConexion();
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            String SELECT = "SELECT gameName, clientName, saleDate, returnDate FROM rental WHERE clientDNI=?";
+            ps = con.prepareStatement(SELECT);
+            ps.setString(1, this.getClientDNI());
+            rs = ps.executeQuery();
+
+            ResultSetMetaData rsMd = rs.getMetaData();
+            int columnsCant = rsMd.getColumnCount();
+
+            model.addColumn("GAME");
+            model.addColumn("CLIENT");
+            model.addColumn("SALE");
+            model.addColumn("DATE");
+
+            while (rs.next()) {
+
+                Object[] rows = new Object[columnsCant];
+
+                for (int i = 0; i < columnsCant; i++) {
+                    rows[i] = rs.getObject(i + 1);
+                }
+
+                model.addRow(rows);
+
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
+    /**
+     * Update the game table.
+     */
+    public void update() {
+        consultTable();
+    }
+
+    /**
+     * Method in charge of adding the listeners
+     */
+    private void addListeners() {
+        this.jbttBack.addActionListener(controller);
+        this.jbttReturnGame.addActionListener(controller);
+        this.jbttSearchClient.addActionListener(controller);
+    }
+
+    //GETTERS AND SETTERS
+    public Rental getRental() {
+        return rental;
+    }
+
+    public void setRental(Rental rental) {
+        this.rental = rental;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public void setSelectedGame(String game) {
+        this.selectedGame = game;
+    }
+
+    public String getSelectedGame() {
+        return this.selectedGame;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public String getClientDNI() {
+        return clientDNI;
+    }
+
+    public void setClientDNI(String clientDNI) {
+        this.clientDNI = clientDNI;
+    }
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jpnlMain = new javax.swing.JPanel();
+        pnlCenter = new javax.swing.JPanel();
+        jcpnlTable = new javax.swing.JScrollPane();
+        jtblRentedGames = new javax.swing.JTable();
+        jpnlUp = new javax.swing.JPanel();
+        txtClientDNI = new javax.swing.JTextField();
+        jbttSearchClient = new javax.swing.JButton();
+        jlblClientDNI = new javax.swing.JLabel();
+        jbttBack = new javax.swing.JButton();
+        jpnlDown = new javax.swing.JPanel();
+        jbttReturnGame = new javax.swing.JButton();
+        jlblBackground = new javax.swing.JLabel();
+
+        setMinimumSize(new java.awt.Dimension(1280, 800));
+        setPreferredSize(new java.awt.Dimension(1280, 800));
+        setLayout(new java.awt.BorderLayout());
+
+        jpnlMain.setBackground(new java.awt.Color(255, 255, 255));
+        jpnlMain.setLayout(null);
+
+        pnlCenter.setPreferredSize(new java.awt.Dimension(1080, 620));
+        pnlCenter.setLayout(new java.awt.BorderLayout());
+
+        jtblRentedGames.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jtblRentedGames.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtblRentedGamesMouseClicked(evt);
+            }
+        });
+        jcpnlTable.setViewportView(jtblRentedGames);
+
+        pnlCenter.add(jcpnlTable, java.awt.BorderLayout.CENTER);
+
+        jpnlUp.setBackground(new java.awt.Color(51, 0, 0));
+
+        txtClientDNI.setFont(new java.awt.Font("Yu Gothic UI Semibold", 0, 18)); // NOI18N
+
+        jbttSearchClient.setBackground(new java.awt.Color(255, 255, 255));
+        jbttSearchClient.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jbttSearchClient.setText("SEARCH");
+
+        jlblClientDNI.setBackground(new java.awt.Color(255, 255, 255));
+        jlblClientDNI.setFont(new java.awt.Font("Yu Gothic UI Semibold", 0, 22)); // NOI18N
+        jlblClientDNI.setForeground(new java.awt.Color(255, 255, 255));
+        jlblClientDNI.setText("Client D.N.I. :");
+
+        jbttBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/py/edu/fiuni/gameshop/view/icons/mini-icons/return.png"))); // NOI18N
+        jbttBack.setContentAreaFilled(false);
+
+        javax.swing.GroupLayout jpnlUpLayout = new javax.swing.GroupLayout(jpnlUp);
+        jpnlUp.setLayout(jpnlUpLayout);
+        jpnlUpLayout.setHorizontalGroup(
+            jpnlUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpnlUpLayout.createSequentialGroup()
+                .addComponent(jbttBack)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 506, Short.MAX_VALUE)
+                .addComponent(jlblClientDNI)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtClientDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jbttSearchClient, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jpnlUpLayout.setVerticalGroup(
+            jpnlUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpnlUpLayout.createSequentialGroup()
+                .addGap(47, 47, 47)
+                .addGroup(jpnlUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtClientDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jbttSearchClient, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jlblClientDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(52, Short.MAX_VALUE))
+            .addGroup(jpnlUpLayout.createSequentialGroup()
+                .addComponent(jbttBack)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        pnlCenter.add(jpnlUp, java.awt.BorderLayout.PAGE_START);
+
+        jpnlDown.setBackground(new java.awt.Color(51, 0, 0));
+
+        jbttReturnGame.setBackground(new java.awt.Color(255, 255, 255));
+        jbttReturnGame.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jbttReturnGame.setText("RETURN THIS GAME");
+
+        javax.swing.GroupLayout jpnlDownLayout = new javax.swing.GroupLayout(jpnlDown);
+        jpnlDown.setLayout(jpnlDownLayout);
+        jpnlDownLayout.setHorizontalGroup(
+            jpnlDownLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpnlDownLayout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addComponent(jbttReturnGame, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(821, Short.MAX_VALUE))
+        );
+        jpnlDownLayout.setVerticalGroup(
+            jpnlDownLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpnlDownLayout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addComponent(jbttReturnGame)
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+
+        pnlCenter.add(jpnlDown, java.awt.BorderLayout.PAGE_END);
+
+        jpnlMain.add(pnlCenter);
+        pnlCenter.setBounds(100, 90, 1080, 620);
+
+        jlblBackground.setBackground(new java.awt.Color(255, 255, 255));
+        jlblBackground.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jlblBackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/py/edu/fiuni/gameshop/view/icons/icon5.jpg"))); // NOI18N
+        jlblBackground.setText("jLabel1");
+        jpnlMain.add(jlblBackground);
+        jlblBackground.setBounds(0, 0, 1280, 800);
+
+        add(jpnlMain, java.awt.BorderLayout.CENTER);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jtblRentedGamesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtblRentedGamesMouseClicked
+        int row = this.jtblRentedGames.rowAtPoint(evt.getPoint());
+        this.selectedGame = String.valueOf(this.jtblRentedGames.getValueAt(row, 0));
+        
+    }//GEN-LAST:event_jtblRentedGamesMouseClicked
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JButton jbttBack;
+    public javax.swing.JButton jbttReturnGame;
+    public javax.swing.JButton jbttSearchClient;
+    private javax.swing.JScrollPane jcpnlTable;
+    private javax.swing.JLabel jlblBackground;
+    private javax.swing.JLabel jlblClientDNI;
+    private javax.swing.JPanel jpnlDown;
+    private javax.swing.JPanel jpnlMain;
+    private javax.swing.JPanel jpnlUp;
+    public javax.swing.JTable jtblRentedGames;
+    private javax.swing.JPanel pnlCenter;
+    public javax.swing.JTextField txtClientDNI;
+    // End of variables declaration//GEN-END:variables
+}
